@@ -1,0 +1,156 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{float}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    linkcolor=blue,
+    citecolor=blue
+}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{IEEE-CIS Fraud Detection Challenge \\}
+
+\author{
+    \IEEEauthorblockN{Khashayar Zardoui}
+    \IEEEauthorblockA{\textit{Dept. Computer Science \& Software Engineering} \\
+    \textit{Concordia University}\\
+    Montreal, Canada \\
+    khashayar.zardoui@mail.concordia.ca}
+    {\footnotesize ID: 40052568}
+    \and
+    \IEEEauthorblockN{Paolo Junior Angeloni}
+    \IEEEauthorblockA{\textit{Dept. Computer Science \& Software Engineering} \\
+    \textit{Concordia University}\\
+    Montreal, Canada \\
+    p\_ange@live.concordia.ca}
+    {\footnotesize ID: 25976944}
+}
+
+\pagestyle{plain}
+\maketitle
+\begin{abstract}
+abstract: This report evaluates the performance...
+\end{abstract}
+
+\section{The Fraud-Detection Pipeline}
+    ...
+    \begin{enumerate}
+        \item ...
+        \item ...
+        \item ...
+    \end{enumerate}
+
+\section{Exploratory Data Analysis}
+    \subsection{Data Structure Inspection}
+        \begin{enumerate}
+            \item types
+            \item missing values
+            \item target balance
+        \end{enumerate}
+\subsection{Statistical Summary \& Visualizations}
+        \begin{figure}[H]
+            \centering
+            % \includegraphics[width=0.48\textwidth]{throughput_bufferChart.png}
+            \caption{some image here}
+            % \label{fig:some}
+        \end{figure}
+        \begin{table}[H]
+            \centering
+            \caption{some stats...}
+            \begin{tabular}{|l|c|}
+            \hline
+            \textbf{Metric } & \textbf{Value} \\
+            \hline
+            one & ... \\
+            two (\%) & ... \\
+            three & ... \\
+            four & ... \\
+            \hline
+            \end{tabular}
+            % \label{tab:first_stats_resnet18}
+        \end{table}
+\subsection{Findings \& Hypotheses}
+    ...
+    \par\vspace{1em}
+    ...
+
+\section{Data Pre-Processing \& Cleaning}
+\subsection{Imputation \& Removal}
+        \begin{enumerate}
+            \item ...
+            \item ...
+            \item ...
+        \end{enumerate}
+    \subsection{Normalize \& Scale Features}
+        \begin{enumerate}
+            \item ...
+            \item ...
+            \item ...
+        \end{enumerate}
+    \subsection{Encoding Categorical Features}
+        \begin{enumerate}
+            \item ...
+            \item ...
+            \item ...
+        \end{enumerate}
+
+\section{Models}
+    \text{intro to the models used}
+    \subsection{Support Vector Machine (SVM) Classifier}
+        \text{experiment hyperparameters (C, gamma, kernel etc)}
+        \text{cross-validation and validation splits to evaluate performance}
+        \text{results using different hyperparameters}
+        \text{training and test metrics: confusion matrix, precision, recall, F1-score, and accuracy}
+
+    \subsection{Decision Tree Classifier}
+        \text{experiment hyperparameters (max depth, min samples split, criterion)}
+        \text{cross-validation and validation splits to evaluate performance}
+        \text{results using different hyperparameters}
+        \text{training and test metrics: confusion matrix, precision, recall, F1-score, and accuracy}
+
+\section{Model Comparison}
+    \paragraph{discuss similarities \& differences. use table}    
+    \begin{table}[H]
+            \centering
+            \caption{some stats...}
+            \begin{tabular}{|l|c|c|}
+            \hline
+            \textbf{Metric } & \textbf{SVM} & \textbf{Decision Tree} \\
+            \hline
+            one & ... & ... \\
+            two (\%) & ... & ... \\
+            three & ... & ... \\
+            four & ... & ... \\
+            \hline
+            \end{tabular}
+            % \label{tab:first_stats_resnet18}
+    \end{table}
+
+\par\vspace{1em}
+\section*{Acknowledgment}
+We would like to thank Professor Arash Azarfar and Firat Oncel for their guidance and support throughout this project. Large Language Models, like Google's Gemini were used in an educational context to further understand the resources for this research.
+
+\begin{thebibliography}{00}
+    \bibitem{b1} PyTorch, ``PyTorch API Documentation,'' [Online]. Available: \url{https://docs.pytorch.org/docs/stable/index.html}. [Accessed: Oct. 21, 2025].
+    \bibitem{b2} Numpy, ``Numpy API Documentation,'' [Online]. Available: \url{https://numpy.org/doc/stable/}. [Accessed: Oct. 21, 2025].
+    \bibitem{b3} matplotlib, ``Matplotlib API Documentation,'' [Online]. Available: \url{https://matplotlib.org/stable/index.html}. [Accessed: Oct. 21, 2025].
+    \bibitem{b4} pandas, ``pandas API Documentation,'' [Online]. Available: \url{https://pandas.pydata.org/docs/}. [Accessed: Oct. 21, 2025].
+    \bibitem{b5} UMAP, ``UMAP API Documentation,'' [Online]. Available: \url{https://umap-learn.readthedocs.io/en/latest/}. [Accessed: Oct. 23, 2025].
+    \bibitem{b5} TSNE, ``TSNE API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html}. [Accessed: Oct. 23, 2025].
+\end{thebibliography}
+\vspace{12pt}
+
+\end{document}
