@@ -36,5 +36,11 @@ reduce dimension/features
 - [feature selection](https://scikit-learn.org/stable/modules/feature_selection.html)
 - [mutual info classification](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.mutual_info_classif.html)
 
-after all table permutes/removal, [save to a new file (for quicker re-use)](https://www.geeksforgeeks.org/pandas/saving-a-pandas-dataframe-as-a-csv/
-)
+after all table permutes/removal, [save to a new file (for quicker re-use)](https://www.geeksforgeeks.org/pandas/saving-a-pandas-dataframe-as-a-csv/)
+
+### example code
+- [EDA explore data](https://www.kaggle.com/code/artgor/eda-and-models#Data-Exploration)
+- [EDA feature-analysis and xgboost](https://www.kaggle.com/code/graykun/ieee-cis-fraud-detection-submission/notebook)
+- [EDA in-depth](https://www.kaggle.com/code/suoires1/fraud-detection-eda-and-modeling)
+- [SVM, DT, XGBOOST](https://www.kaggle.com/code/mikestvictor/msv-fraud-detection/notebook)
+- [models compare](https://www.kaggle.com/code/vchulski/ieee-simple-models-comparison)

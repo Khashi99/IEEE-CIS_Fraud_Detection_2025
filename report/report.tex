@@ -21,7 +21,9 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{IEEE-CIS Fraud Detection Challenge \\}
+\title{IEEE-CIS Fraud Detection Challenge \\
+    \large\textit{Comparative Study of SVM and Decision Tree Binary Classification}
+}
 
 \author{
     \IEEEauthorblockN{Khashayar Zardoui}
@@ -56,7 +58,8 @@ abstract: This report evaluates the performance...
 \section{Exploratory Data Analysis}
     \subsection{Data Structure Inspection}
         \begin{enumerate}
-            \item types
+            \item \par
+                Before any data transformation, we observed the \texttt{train} and \texttt{test} datasets had a mixture of \texttt{float64}, \texttt{int64} and \texttt{object} types
             \item missing values
             \item target balance
         \end{enumerate}
