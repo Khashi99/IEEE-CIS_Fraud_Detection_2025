@@ -3,10 +3,12 @@
 ### EDA
 - goal: look at the data. any data that we use for the model should be filled
 - if its 60% full you keep the column
-- filtering the data (Forsome columns, the vast majority missing, you drop them. filter 40 columns).
+- filtering the data 
+    - for some columns, the vast majority missing, you drop them. filter 40 columns.
 - how you will impute the data (median or main)
 - use sklearn's `LabelEncoder` (eg. apple/android = 0/1)
-- 400 features left. Either do full feature or feature selection. (`mutual_info_classification`)
+- 400 features left. 
+    - either do full feature or feature selection. (`mutual_info_classification`)
 - merge relevent columns (card1-card6)
 
 ### models
@@ -28,8 +30,9 @@
 - [preprocessing data](https://scikit-learn.org/stable/modules/preprocessing.html#preprocessing)
 - [imputation of missing values](https://scikit-learn.org/stable/modules/impute.html)
 - [encoding text to numeric data](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html)
+- [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
+    - used by all models
 - [Support Vector Machines](https://scikit-learn.org/stable/modules/svm.html#svm)
-    - [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
 - [Decision Trees](https://scikit-learn.org/stable/modules/tree.html)
 - [xgboost docs](https://xgboost.readthedocs.io/en/latest/index.html)
     - [xgboost with scikit-learn interface](https://xgboost.readthedocs.io/en/latest/python/python_intro.html#scikit-learn-interface)
