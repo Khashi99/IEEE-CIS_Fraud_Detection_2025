@@ -113,10 +113,15 @@ abstract: This report evaluates the performance...
 \section{Models}
     \text{intro to the models used}
     \subsection{Support Vector Machine (SVM) Classifier}
-        \text{experiment hyperparameters (C, gamma, kernel etc)}
-        \text{cross-validation and validation splits to evaluate performance}
-        \text{results using different hyperparameters}
-        \text{training and test metrics: confusion matrix, precision, recall, F1-score, and accuracy}
+    Due to the size of the dataset (590,000+ samples), a standard SVM with a non-linear kernel ($O(n^3)$) was computationally infeasible. We opted for a LinearSVC ($O(n)$) to utilize the entire training set. To satisfy the hyperparameter tuning requirement2, we tuned the Regularization parameter (C) and the Loss function (Hinge vs. Squared Hinge) instead of the kernel.
+        
+    experiment hyperparameters (C, gamma, kernel etc)
+    
+    cross-validation and validation splits to evaluate performance
+        
+    results using different hyperparameters
+        
+    training and test metrics: confusion matrix, precision, recall, F1-score, and accuracy
 
     \subsection{Decision Tree Classifier}
         \text{experiment hyperparameters (max depth, min samples split, criterion)}

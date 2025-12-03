@@ -25,12 +25,15 @@
 - submit a `csv` that has the probabilities (not zeros and ones)
 
 ## references
-
-[encoding text to numeric data](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html
-)
-
-[area-under-the-curve score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
-)
+- [preprocessing data](https://scikit-learn.org/stable/modules/preprocessing.html#preprocessing)
+- [imputation of missing values](https://scikit-learn.org/stable/modules/impute.html)
+- [encoding text to numeric data](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html)
+- [Support Vector Machines](https://scikit-learn.org/stable/modules/svm.html#svm)
+    - [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
+- [Decision Trees](https://scikit-learn.org/stable/modules/tree.html)
+- [xgboost docs](https://xgboost.readthedocs.io/en/latest/index.html)
+    - [xgboost with scikit-learn interface](https://xgboost.readthedocs.io/en/latest/python/python_intro.html#scikit-learn-interface)
+- [area-under-the-curve score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html)
 
 reduce dimension/features
 - [feature selection](https://scikit-learn.org/stable/modules/feature_selection.html)
