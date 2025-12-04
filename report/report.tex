@@ -44,11 +44,16 @@
 \pagestyle{plain}
 \maketitle
 \begin{abstract}
-abstract: This report evaluates the performance...
+The objective of this project was to develop a machine learning pipeline capable of identifying fraudulent credit card transactions within the IEEE-CIS Fraud Detection dataset. The primary challenge was the extreme class imbalance (approx. 3.5\% fraud vs. 96.5\% legitimate), requiring models that prioritize Precision (minimizing customer friction via false alarms) while maintaining high Recall (capturing actual fraud).
 \end{abstract}
 
 \section{The Fraud-Detection Pipeline}
-    ...
+    We implemented a robust data processing pipeline involving missing value imputation, label encoding for categorical variables, and standard scaling. To address the computational challenges of the large dataset (590k+ entries), we utilized Principal Component Analysis (PCA) for dimensionality reduction on linear models. We evaluated three distinct classification architectures:
+    \begin{enumerate}
+        \item Linear Support Vector Machine (LinearSVC): A baseline linear classifier utilizing the Primal solver and PCA
+        \item Decision Tree: A non-linear, rules-based classifier tuned for depth and split criteria
+        \item XGBoost: An advanced gradient-boosting ensemble method utilizing histogram-based optimization
+    \end{enumerate}
     \begin{enumerate}
         \item Data loading and exploration (EDA)
         \item Removal, Imputation, Label Encoding and Scaling
@@ -159,6 +164,12 @@ abstract: This report evaluates the performance...
             \end{tabular}
             % \label{tab:first_stats_resnet18}
     \end{table}
+    \par
+    The LinearSVC provided a baseline AUC of 0.815, but struggled with convergence times and lacked the complexity to model non-linear fraud patterns.
+
+    The Decision Tree achieved a higher AUC of 0.848, but exhibited signs of overfitting (high training accuracy vs. lower validation precision), confirming that a single tree has high variance.
+
+    XGBoost emerged as the vastly superior model, achieving an AUC-ROC of 0.963 and an F1-Score of 0.70. It successfully balanced a high Precision (93\%) with a Recall of 56\%, significantly outperforming the other models in identifying fraud without disrupting legitimate users.
 
 \par\vspace{1em}
 \section*{Acknowledgment}

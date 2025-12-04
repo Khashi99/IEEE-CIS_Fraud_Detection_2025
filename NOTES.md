@@ -32,6 +32,7 @@
 - [encoding text to numeric data](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html)
 - [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
     - used by all models
+- [Feature Selection](https://scikit-learn.org/stable/modules/feature_selection.html)
 - [Support Vector Machines](https://scikit-learn.org/stable/modules/svm.html#svm)
     - [PCA](https://scikit-learn.org/stable/modules/decomposition.html#pca)
 - [Decision Trees](https://scikit-learn.org/stable/modules/tree.html)
