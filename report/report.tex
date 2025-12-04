@@ -114,9 +114,11 @@ abstract: This report evaluates the performance...
 
 \section{Models}
     \text{intro to the models used}
+
     \subsection{Support Vector Machine (SVM) Classifier}
     Due to the size of the dataset (590,000+ samples), a standard SVM with a non-linear kernel ($O(n^3)$) was computationally infeasible. We opted for a LinearSVC ($O(n)$) to utilize the entire training set. To satisfy the hyperparameter tuning requirement2, we tuned the Regularization parameter (C) and the Loss function (Hinge vs. Squared Hinge) instead of the kernel.
-        
+    Additionally, we applied Principal Component Analysis (PCA) to the SVM input to reduce dimensionality, which resolved convergence issues and significantly improved training speed.
+
     experiment hyperparameters (C, gamma, kernel etc)
     
     cross-validation and validation splits to evaluate performance
@@ -130,6 +132,15 @@ abstract: This report evaluates the performance...
         \text{cross-validation and validation splits to evaluate performance}
         \text{results using different hyperparameters}
         \text{training and test metrics: confusion matrix, precision, recall, F1-score, and accuracy}
+        \par
+            The Decision Tree model demonstrated signs of mild overfitting. While it achieved a high F1-score of 0.68 on the training set, this dropped to 0.57 on the validation set. Specifically, the Precision for fraud detection fell from 92\% (training) to 77\% (validation), indicating that some of the decision rules learned were specific to the training noise and did not generalize well. Furthermore, the Recall remained low in both sets (0.53 training vs. 0.45 validation), suggesting that a single decision tree lacks the complexity required to capture the full variety of fraudulent patterns in this dataset.
+
+    \subsection{XGBoost Classifier}
+        \par
+        \par
+            The XGBoost classifier proved to be the superior model. While the Decision Tree suffered from overfitting (high variance), XGBoost demonstrated robust generalization.
+            
+            On the Validation set, XGBoost achieved a Precision of 0.93, meaning it generated very few false positives (false alarms), which is critical for maintaining user trust. Simultaneously, it achieved a Recall of 0.56, capturing the majority of fraud instances. The F1-Score of 0.70 (Validation) significantly outperforms the Decision Tree (0.57) and indicates that the Gradient Boosting method successfully captured complex, non-linear relationships that the simpler models missed.
 
 \section{Model Comparison}
     \paragraph{discuss similarities \& differences. use table}    
@@ -163,10 +174,10 @@ We would like to thank Professor Arash Azarfar and Firat Oncel for their guidanc
     \bibitem{b7} label encoding, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/preprocessing_targets.html#label-encoding}. [Accessed: Nov. 28, 2025].
     \bibitem{b8} hyperparameter tuning using GridSearchCV, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/grid_search.html#grid-search}. [Accessed: Nov. 30, 2025].
     \bibitem{b9} Support Vector Machines, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/svm.html}. [Accessed: Nov. 30, 2025].
-    \bibitem{b10} Decision Trees , ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/tree.html}. [Accessed: Nov. 30, 2025].
-    \bibitem{b11} XGBoostClassifier, ``XGBoost API Documentation,'' [Online]. Available: \url{https://xgboost.readthedocs.io/en/stable/}. [Accessed: Nov. 30, 2025].
-    \bibitem{b12} metrics, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/api/sklearn.metrics.html}. [Accessed: Dec. 02, 2025].
-
+    \bibitem{b10} Principal Component Analysis (PCA), ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/decomposition.html#pca}. [Accessed: Dec. 02, 2025].
+    \bibitem{b11} Decision Trees , ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/tree.html}. [Accessed: Nov. 30, 2025].
+    \bibitem{b12} XGBoostClassifier, ``XGBoost API Documentation,'' [Online]. Available: \url{https://xgboost.readthedocs.io/en/stable/}. [Accessed: Nov. 30, 2025].
+    \bibitem{b13} metrics, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/api/sklearn.metrics.html}. [Accessed: Dec. 02, 2025].
 \end{thebibliography}
 \vspace{12pt}
 

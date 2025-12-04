@@ -33,6 +33,7 @@
 - [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
     - used by all models
 - [Support Vector Machines](https://scikit-learn.org/stable/modules/svm.html#svm)
+    - [PCA](https://scikit-learn.org/stable/modules/decomposition.html#pca)
 - [Decision Trees](https://scikit-learn.org/stable/modules/tree.html)
 - [xgboost docs](https://xgboost.readthedocs.io/en/latest/index.html)
     - [xgboost with scikit-learn interface](https://xgboost.readthedocs.io/en/latest/python/python_intro.html#scikit-learn-interface)
