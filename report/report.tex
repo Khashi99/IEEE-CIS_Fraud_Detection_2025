@@ -57,13 +57,34 @@
             \item target balance \par
                 description goes here...
         \end{enumerate}
-\subsection{Statistical Summary \& Visualizations}
+    \subsection{Statistical Summary \& Visualizations}
         \begin{figure}[H]
             \centering
             \includegraphics[width=0.48\textwidth]{dist_pie.png}
             \caption{isFraud Distribution}
             \label{fig:dist-pie}
         \end{figure}
+
+        An analysis of the \texttt{TransactionAmt} feature revealed a heavily right-skewed distribution, typical of financial data where small transactions are frequent and large ones are rare. To address this, we applied a log-transformation ($\log(1+x)$), which normalized the distribution (Figure \ref{fig:dist-comparison}), making it more suitable for linear classifiers like the SVM.
+
+        \begin{figure}[H]
+            \centering
+            \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{distamt_original.png}
+                \caption{Original Skewed Distribution}
+                \label{fig:distamt-orig}
+            \end{minipage}\hfill
+            \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{distamt_log.png}
+                \caption{Log-Transformed Distribution}
+                \label{fig:distamt-log}
+            \end{minipage}
+            \caption{Transaction Amount Distribution. The log-transformation (Right) reveals a underlying normal-like structure, correcting the extreme skew observed in the raw data (Left).}
+            \label{fig:dist-comparison}
+        \end{figure}
+        
         \begin{table}[H]
             \centering
             \caption{some stats...}
@@ -79,7 +100,7 @@
             \end{tabular}
             % \label{tab:first_stats_resnet18}
         \end{table}
-\subsection{Findings \& Hypotheses}
+    \subsection{Findings \& Hypotheses}
     ...
     \par\vspace{1em}
     ...
