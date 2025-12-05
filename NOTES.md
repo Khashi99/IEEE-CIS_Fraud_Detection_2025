@@ -21,6 +21,18 @@
     - put -1 to get the most!
 - No DBSCAN for the project. we are just doing binary classification (fraud or not).
 
+### metrics
+- `precision`: ability of classifier not to label as positive, a sample that is negative
+- `recall`: ability of classifier to find all positive samples
+- `F1-score`: the harmonic (punishes score heavily if `precision` or `recall` is low) mean between `precision` and `recall`
+- `accuracy`: percentage of total predictions that were correct (basic and can be misleading)
+- `auc-roc`: probability the model will score a random positive sample higher than a random negative sample
+- `confusion matrix`:
+    - top-left = true negative (happy customer) - the "good"
+    - bottom-right = true positive (caught thief) - the "good"
+    - top-right = false positive (blocked legit customer) - the "bad"
+    - bottom-left = false negative (successful thief) - the "bad"
+
 ### submission    
 - The score that you use is the area under the curve (ROC)!
     - 95% of existing transactions in the dataset are not fraud
