@@ -22,7 +22,7 @@
 \begin{document}
 
 \title{IEEE-CIS Fraud Detection Challenge \\
-    \large\textit{Comparative Study of SVM and Decision Tree Binary Classification}
+    \large\textit{A Comparative Study of Binary Classification}
 }
 
 \author{
@@ -44,18 +44,10 @@
 \pagestyle{plain}
 \maketitle
 \begin{abstract}
-    The objective of this project was to develop a machine learning pipeline capable of identifying fraudulent credit card transactions within the IEEE-CIS Fraud Detection dataset \cite{b1}. The primary challenge was the extreme class imbalance (approx. 3.5\% fraud vs. 96.5\% legitimate), requiring models that prioritize Precision (minimizing customer friction via false alarms) while maintaining high Recall (capturing actual fraud). Given this imbalanced dataset, we used the more robust \textit{Area Under the Receiver Operating Characteristic Curve} \cite{b2} metric to evaluate a model's ability to rank based on confidence. In experimenting with various machine-learning models, our findings show... 
+    The objective of this project was to develop a machine learning pipeline capable of identifying fraudulent credit card transactions within the IEEE-CIS Fraud Detection dataset \cite{b1}. The primary challenge was the extreme class imbalance (3.5\% fraud vs. 96.5\% legitimate), requiring models that prioritize Precision (minimizing customer friction via false alarms) while maintaining high Recall (capturing actual fraud). Given this imbalanced dataset, we used the more robust \textit{Area Under the Receiver Operating Characteristic Curve} \cite{b2} metric to evaluate a model's ability to rank based on confidence. In experimenting with various machine-learning models, our findings show... 
 \end{abstract}
 
-\section{The Fraud-Detection Pipeline}
-    We implemented a data processing pipeline involving missing value removal and imputation, label encoding for categorical variables, and standard scaling. 
-    \begin{enumerate}
-        \item Data loading and exploration (EDA)
-        \item Removal, Imputation, Label Encoding and Scaling
-        \item Model training and performance assessment using \textit{Area Under the Receiver Operating Characteristic Curve}
-    \end{enumerate}
-
-\section{Exploratory Data Analysis}
+\section{Exploratory Data Analysis (EDA)}
     \subsection{Data Structure Inspection}
         \begin{enumerate}
             \item \par
@@ -113,27 +105,41 @@
         \end{enumerate}
 
 \section{Models}
-    \text{We experiemented with three types of machine-learning classifiers:}
-    \begin{enumerate}
-        \item Linear Support Vector Machine (LinearSVC) \cite{b3}: A baseline linear classifier utilizing the Primal solver and PCA
-        \item Decision Tree: A non-linear, rules-based classifier tuned for depth and split criteria
-        \item Extreme Gradient Boosting (XGBoost): An advanced gradient-boosting ensemble method utilizing histogram-based optimization
-    \end{enumerate}
     \par
-        Each model has a particular configuration that will be discussed below
-    \subsection{SVM}
-        To address the computational challenges of the large dataset (590k+ entries), we utilized Principal Component Analysis (PCA) for dimensionality reduction on linear models.
+        Each model required specific configuration and hyperparameter tuning to handle the dataset's size ($590,000+$ rows) and class imbalance ($3.5\%$ fraud / $96.5\%$ legitimate).
+    \subsection{Linear Support Vector Machine (LinearSVC) \cite{b6}}
+        To handle the large dataset, we applied \textbf{Principal Component Analysis (PCA)} \cite{b9} for feature reduction to 83 components that explain $95\%$ of the data's variance. We then utilized \texttt{GridSearchCV} \cite{b10} to compare two distinct strategies by tuning the following parameters:
+        \begin{itemize}
+            \item \textbf{Penalty}: Tested \texttt{l2}, which gently shrinks all feature weights to prevent overfitting, against \texttt{l1}, which aggressively sets weak feature weights to zero.
+            \item \textbf{Regularization}: Low values ($[0.1, 0.01, 0.001]$) create a "wider margin" between classes, forcing the model to ignore noise and find a simpler, more generalizable boundary and improve convergence speed.
+            \item \textbf{Tolerance}: We adjusted the stopping criteria precision using a standard tolerance ($1e^{-4}$) for the L2 models but a slightly looser tolerance ($1e^{-3}$) for the L1 models to ensure the convergence within a reasonable time.
+        \end{itemize}
 
-    \subsection{Decision Tree}
-        \par
-            
+        \subsection{Decision Tree}
+            We implemented a Decision Tree as a non-linear baseline, utilizing \texttt{GridSearchCV} \cite{b10} to evaluate 18 candidate structures evaluated via 3-fold cross-validation:
+        \begin{itemize}
+            \item \textbf{Max Depth}: We compared restricted depths $[10, 20]$ against \texttt{None}, which allows the tree to grow until all leaves are pure (maximum complexity).
+            \item \textbf{Min Samples Split}: Tested $[20, 100, 500]$. Higher values force the tree to learn broader patterns by preventing it from creating specific rules for small groups of outliers.
+            \item \textbf{Criterion}: \texttt{'gini'} vs. \texttt{'entropy'} to compare splitting strategies based on Gini Impurity versus Information Gain.
+        \end{itemize}
 
-    \subsection{XGBoost}
-        \par
-
+        \subsection{Extreme Gradient Boosting (XGBoost) \cite{b8}}
+            We utilized the \texttt{XGBClassifier} with the following hyperparameters:
+        \begin{itemize}
+            \item \textbf{n\_estimators}: Set to $500$. This defines the ensemble size (number of trees), meaning the model corrects its errors sequentially 500 times to refine predictions.
+            \item \textbf{Learning Rate}: Set to $0.05$. A lower rate ensures that no single tree dominates the decision, preventing overfitting and leading to a more stable model.
+            \item \textbf{Subsample \& Colsample}: Both set to $0.9$. This forces each tree to train on a random $90\%$ of the rows and $90\%$ of the features.
+        \end{itemize}
 
 \section{Model Comparison}
-    \paragraph{discuss similarities \& differences. use table}    
+    \par
+        The LinearSVC provided a baseline AUC of 0.815, but struggled with convergence times and lacked the complexity to model non-linear fraud patterns. Due to the size of the dataset (590,000+ samples), a standard SVM with a non-linear kernel ($O(n^3)$) was computationally infeasible. We opted for a LinearSVC ($O(n)$) to utilize the entire training set. To satisfy the hyperparameter tuning requirement, we tuned the Regularization parameter (C), penalty (L1 vs. L2) and tolerance, instead of the kernel.
+        Additionally, we applied Principal Component Analysis (PCA) to the SVM input to reduce dimensionality, which resolved convergence issues and significantly improved training speed.
+
+        The Decision Tree achieved a higher AUC of 0.848, but exhibited signs of overfitting (high training accuracy vs. lower validation precision), confirming that a single tree has high variance.While it achieved a high F1-score of 0.68 on the training set, this dropped to 0.57 on the validation set. Specifically, the Precision for fraud detection fell from 92\% (training) to 77\% (validation), indicating that some of the decision rules learned were specific to the training noise and did not generalize well. Furthermore, the Recall remained low in both sets (0.53 training vs. 0.45 validation), suggesting that a single decision tree lacks the complexity required to capture the full variety of fraudulent patterns in this dataset.
+
+        XGBoost emerged as the superior model, achieving an AUC-ROC of 0.963 and an F1-Score of 0.70. It successfully balanced a high Precision (93\%) with a Recall of 56\%, significantly outperforming the other models in identifying fraud without disrupting legitimate users. While the Decision Tree suffered from overfitting (high variance), XGBoost demonstrated robust generalization.            
+        On the Validation set, XGBoost achieved a Precision of 0.93, meaning it generated very few false positives (false alarms), which is critical for maintaining user trust. Moreover, it achieved a Recall of 0.56, capturing the majority of fraud instances. The F1-Score of 0.70 (Validation) significantly outperforms the Decision Tree (0.57) and indicates that the Gradient Boosting method successfully captured complex, non-linear relationships that the simpler models missed.
     \begin{table}[H]
             \centering
             \caption{some stats...}
@@ -149,20 +155,11 @@
             \end{tabular}
             % \label{tab:first_stats_resnet18}
     \end{table}
-    \par
-        The LinearSVC provided a baseline AUC of 0.815, but struggled with convergence times and lacked the complexity to model non-linear fraud patterns. Due to the size of the dataset (590,000+ samples), a standard SVM with a non-linear kernel ($O(n^3)$) was computationally infeasible. We opted for a LinearSVC ($O(n)$) to utilize the entire training set. To satisfy the hyperparameter tuning requirement, we tuned the Regularization parameter (C), penalty (L1 vs. L2) and tolerance, instead of the kernel.
-        Additionally, we applied Principal Component Analysis (PCA) to the SVM input to reduce dimensionality, which resolved convergence issues and significantly improved training speed.
-
-        The Decision Tree achieved a higher AUC of 0.848, but exhibited signs of overfitting (high training accuracy vs. lower validation precision), confirming that a single tree has high variance.The Decision Tree model demonstrated signs of mild overfitting. While it achieved a high F1-score of 0.68 on the training set, this dropped to 0.57 on the validation set. Specifically, the Precision for fraud detection fell from 92\% (training) to 77\% (validation), indicating that some of the decision rules learned were specific to the training noise and did not generalize well. Furthermore, the Recall remained low in both sets (0.53 training vs. 0.45 validation), suggesting that a single decision tree lacks the complexity required to capture the full variety of fraudulent patterns in this dataset.
-
-        XGBoost emerged as the vastly superior model, achieving an AUC-ROC of 0.963 and an F1-Score of 0.70. It successfully balanced a high Precision (93\%) with a Recall of 56\%, significantly outperforming the other models in identifying fraud without disrupting legitimate users.
-        The XGBoost classifier proved to be the superior model. While the Decision Tree suffered from overfitting (high variance), XGBoost demonstrated robust generalization.            
-        On the Validation set, XGBoost achieved a Precision of 0.93, meaning it generated very few false positives (false alarms), which is critical for maintaining user trust. Simultaneously, it achieved a Recall of 0.56, capturing the majority of fraud instances. The F1-Score of 0.70 (Validation) significantly outperforms the Decision Tree (0.57) and indicates that the Gradient Boosting method successfully captured complex, non-linear relationships that the simpler models missed.
-
+        
 \section{Kaggle Submission}
     Each model's \textit{AUC-ROC} \cite{b2} results were submitted to the Kaggle competition \cite{b1} in \texttt{.csv} format. Each file is a two-column table with \texttt{TransactionID} and \texttt{isFraud} headers, indicating the confidence level that a transaction is fraudulent. Below are each model's score on the private and public test datasets.
     \begin{figure}[H]
-            \centering
+        \centering
             \includegraphics[width=0.48\textwidth]{kaggle.png}
             \caption{Kaggle competition submission results}
             \label{fig:kaggle}
@@ -175,13 +172,13 @@
 \begin{thebibliography}{00}
     \bibitem{b1} IEEE-CIS Fraud Detection, ``kaggle competition overview,'' [Online]. Available: \url{https://www.kaggle.com/competitions/ieee-fraud-detection/overview}. [Accessed: Nov. 20, 2025].
     \bibitem{b2} metrics, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/api/sklearn.metrics.html}. [Accessed: Dec. 02, 2025].
-    \bibitem{b3} Support Vector Machines, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/svm.html}. [Accessed: Nov. 30, 2025].
-    \bibitem{b4} Principal Component Analysis (PCA), ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/decomposition.html#pca}. [Accessed: Dec. 02, 2025].
-    \bibitem{b5} Decision Trees , ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/tree.html}. [Accessed: Nov. 30, 2025].
-    \bibitem{b6} XGBoostClassifier, ``XGBoost API Documentation,'' [Online]. Available: \url{https://xgboost.readthedocs.io/en/stable/}. [Accessed: Nov. 30, 2025].
-    \bibitem{b7} data preprocessing, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/preprocessing.html}. [Accessed: Nov. 28, 2025].
-    \bibitem{b8} data imputation, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/impute.html}. [Accessed: Nov. 28, 2025].
-    \bibitem{b9} label encoding, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/preprocessing_targets.html#label-encoding}. [Accessed: Nov. 28, 2025].
+    \bibitem{b3} data preprocessing, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/preprocessing.html}. [Accessed: Nov. 28, 2025].
+    \bibitem{b4} data imputation, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/impute.html}. [Accessed: Nov. 28, 2025].
+    \bibitem{b5} label encoding, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/preprocessing_targets.html#label-encoding}. [Accessed: Nov. 28, 2025].
+    \bibitem{b6} Support Vector Machines, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/svm.html}. [Accessed: Nov. 30, 2025].
+    \bibitem{b7} Decision Trees , ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/tree.html}. [Accessed: Nov. 30, 2025].
+    \bibitem{b8} XGBoostClassifier, ``XGBoost API Documentation,'' [Online]. Available: \url{https://xgboost.readthedocs.io/en/stable/}. [Accessed: Nov. 30, 2025].
+    \bibitem{b9} Principal Component Analysis (PCA), ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/decomposition.html#pca}. [Accessed: Dec. 02, 2025].
     \bibitem{b10} hyperparameter tuning using GridSearchCV, ``sklearn API Documentation,'' [Online]. Available: \url{https://scikit-learn.org/stable/modules/grid_search.html#grid-search}. [Accessed: Nov. 30, 2025].
     \bibitem{b11} Numpy, ``Numpy API Documentation,'' [Online]. Available: \url{https://numpy.org/doc/stable/}. [Accessed: Nov. 25, 2025].
     \bibitem{b12} matplotlib, ``Matplotlib API Documentation,'' [Online]. Available: \url{https://matplotlib.org/stable/index.html}. [Accessed: Nov. 25, 2025].
