@@ -68,17 +68,15 @@
             \centering
             \begin{minipage}{0.48\textwidth}
                 \centering
-                \includegraphics[height=5cm]{distamt_original.png}
-                \caption{Original Skewed Distribution}
+                \includegraphics[height=6cm]{distamt_original.png}
                 \label{fig:distamt-orig}
             \end{minipage}\hfill
             \begin{minipage}{0.48\textwidth}
                 \centering
-                \includegraphics[height=5cm]{distamt_log.png}
-                \caption{Log-Transformed Distribution}
+                \includegraphics[height=6cm]{distamt_log.png}
                 \label{fig:distamt-log}
             \end{minipage}
-            \caption{Transaction Amount Distribution. The log-transformation reveals a underlying normal-like structure, correcting the extreme skew observed in the raw data}
+            \caption{TransactionAmt Distribution. The log-transformation reveals a normal-like structure, correcting the extreme skew observed in the raw data}
             \label{fig:dist-comparison}
         \end{figure}
         
@@ -121,24 +119,24 @@
     \subsection{Imputation of Missing Values \cite{b4}}
         The remaining missing values were adjusted using the \texttt{SimpleImputer} from Scikit-Learn. We adopted a split strategy based on feature type:
         \begin{itemize}
-            \item \textbf{Numerical Features}: Imputed using the \textbf{median} value. This method was chosen over the mean to be more robust against the heavy outliers present in financial transaction amounts.
-            \item \textbf{Categorical Features}: Imputed using the \textbf{most frequent} value to preserve the underlying category distribution.
+            \item \textbf{Numerical Features}: Imputed using the \texttt{median} value. This method was chosen over the mean to be more robust against the heavy outliers present in financial transaction amounts.
+            \item \textbf{Categorical Features}: Imputed using the \texttt{most frequent} value to preserve the underlying category distribution.
         \end{itemize}
         The imputers were fitted only on the training set and applied to the test set to avoid data leakage.
 
     \subsection{Encoding Categorical Features \cite{b5}}
-        To convert categorical variables (e.g., \texttt{ProductCD}) into a machine-readable numeric format, we applied \textbf{Label Encoding}. 
+        To convert categorical variables (e.g., \texttt{ProductCD}) into a machine-readable numeric format, we applied label encoding. 
         \par
-        A standard label encoder was fitted on the training data. Known categories were mapped to their learned integers, while unknown categories in the test set were assigned a distinct value of \texttt{-1} to prevent errors during prediction.
+        A standard \texttt{LabelEncoder} was fitted on the training data. Known categories were mapped to their learned integers, while unknown categories in the test set were assigned a distinct value of \texttt{-1} to prevent errors during prediction.
 
     \subsection{Feature Normalization \& Scaling \cite{b3}}
-        Finally, we applied the (\texttt{StandardScaler}) to all features. This transformation centers the data such that each feature has a mean of 0 and a variance of 1. 
+        We applied the (\texttt{StandardScaler}) to all features. This transformation centers the data such that each feature has a mean of 0 and a variance of 1. 
         \par
         This step is critical for the Support Vector Machine (SVM) model, which relies on Euclidean distance and can be heavily biased by features with large magnitudes (e.g., \texttt{TransactionAmt}) dominating those with small ranges (e.g., encoded categories).
 
 \section{Models}
     \par
-        Each model required specific configuration and hyperparameter tuning to handle the dataset's size ($590,000+$ rows) and class imbalance ($3.5\%$ fraud / $96.5\%$ legitimate). We partitioned the available labeled data into a training set ($80\%$), used for model fitting and hyperparameter tuning, and a validation set ($20\%$), used for reporting final metrics. We utilized \textit{stratified sampling} for this split to ensure that the minority class (fraud) remained represented equally ($3.5\%$) in both subsets.
+        Each model required specific configuration and hyperparameter tuning to handle the dataset's size ($590,000+$ rows) and class imbalance ($3.5\%$ fraud / $96.5\%$ legitimate). The labeled data was partitioned into a training set ($80\%$), used for model fitting and hyperparameter tuning, and a validation set ($20\%$), used for reporting final metrics. We utilized stratified sampling for this split to ensure that the minority class (fraud) remained represented equally ($3.5\%$) in both subsets.
     \subsection{Linear Support Vector Machine (LinearSVC) \cite{b6}}
         To handle the large dataset, we applied \textbf{Principal Component Analysis (PCA)} \cite{b7} for feature reduction to 83 components that explain $95\%$ of the data's variance. This resolved convergence issues and significantly improved training speed. We then utilized \texttt{GridSearchCV} \cite{b8} to compare two distinct strategies by tuning the following parameters:
         \begin{itemize}
@@ -173,12 +171,12 @@
         
         \textbf{Decision Tree} showed clear signs of overfitting. Its precision dropped from 92\% during training to 77\% during validation, and it failed to generalize well, achieving a moderate F1-score of 0.57.
         
-        \textbf{XGBoost} emerged as the best model, achieving the highest AUC (0.963) and F1-Score (0.70). It prioritized precision (93\%), minimizing false positives to ensure a smooth user experience, while capturing 56\% of fraud cases.
+        \textbf{XGBoost} emerged as the best model, achieving the highest AUC (0.963) and F1-Score (0.70). It prioritized precision (93\%), minimizing false positives to ensure a smooth user experience, while capturing 56\% of fraud cases (recall).
 
     \subsection{Computation and Interpretability}
         \textbf{Computation:} The LinearSVC required PCA dimensionality reduction to converge within a reasonable timeframe. The Decision Tree was the fastest to train but failed to generalize its fast learning to new data. XGBoost, while computationally intensive due to the ensemble size, implements histogram-based optimization to maintain training efficiency on the large dataset.
         
-        \textbf{Interpretability:} The Decision Tree offers the clearest "white-box" rules (e.g., "If Amount  $> 100$, then Fraud"). LinearSVC provides feature weights, though these interpretability benefits were negated by the PCA transformation which obscured the original features. XGBoost represents a "black-box" ensemble; while its internal logic is difficult to trace compared to a single tree, it delivers the highest predictive value.
+        \textbf{Interpretability:} The Decision Tree offers the clearest "white-box" rules (e.g., "If Amount  $> 100$, then Fraud"). LinearSVC provides feature weights, though these interpretability benefits were obscured by the PCA transformation of original features. XGBoost represents a "black-box" ensemble; while its internal logic is difficult to trace compared to a single tree, it delivers the highest predictive value.
         
         \begin{table}[H]
             \centering
@@ -187,7 +185,7 @@
             \label{tab:metrics-group}
             \begin{minipage}{\linewidth}
                 \centering
-                \textbf{\normalsize Training Metrics} \\[5pt]
+                \textbf{\normalsize Training Metrics} \\[4pt]
                 \begin{tabular}{|l|c|c|c|}
                     \hline
                     \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
@@ -200,11 +198,11 @@
                 \end{tabular}
             \end{minipage}
 
-            \vspace{2em}
+            \vspace{1.15em}
 
             \begin{minipage}{\linewidth}
                 \centering
-                \textbf{\normalsize Validation Metrics} \\[5pt]
+                \textbf{\normalsize Validation Metrics} \\[4pt]
                 \begin{tabular}{|l|c|c|c|}
                     \hline
                     \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
@@ -217,11 +215,11 @@
                 \end{tabular}
             \end{minipage}
 
-            \vspace{2em}
+            \vspace{1.15em}
 
             \begin{minipage}{\linewidth}
                 \centering
-                \textbf{\normalsize AUC-ROC Metrics} \\[5pt]
+                \textbf{\normalsize AUC-ROC Metrics} \\[4pt]
                 \begin{tabular}{|l|c|c|c|}
                     \hline
                     \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
@@ -231,6 +229,13 @@
                 \end{tabular}
             \end{minipage}
     \end{table}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.44\textwidth]{auc.png}
+        \caption{AUC-ROC for each trained model}
+        \label{fig:auc-graph}
+    \end{figure}
     
     Figure \ref{fig:cmatrix-comparison} visualizes the distinct error patterns of each model. The \textbf{LinearSVC} detects the highest volume of fraud (High True Positives, bottom-right quadrant) but generates excessive false alarms (High False Positives, top-right), reflecting its "high recall, low precision" nature. Conversely, the \textbf{Decision Tree} misses the most fraud cases (Highest False Negatives, bottom-left), resulting in the lowest recall. \textbf{XGBoost} significantly minimizes False Positives (top-right) compared to the SVM while detecting more fraud than the Decision Tree, offering the most precise predictions.
 
