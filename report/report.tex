@@ -44,70 +44,79 @@
 \pagestyle{plain}
 \maketitle
 \begin{abstract}
-    The objective of this project was to develop a machine learning pipeline capable of identifying fraudulent credit card transactions within the IEEE-CIS Fraud Detection dataset \cite{b1}. Given the extreme class imbalance (3.5\% fraud), we utilized the \textit{Area Under the Receiver Operating Characteristic Curve} (AUC-ROC) \cite{b2} as the primary metric to evaluate the models' ability to distinguish between classes. We compare LinearSVC, Decision Tree, and XGBoost classifiers. Our findings demonstrate that the XGBoost ensemble significantly outperformed the single-learner architectures.
+    The objective of this project was to develop a machine learning pipeline capable of identifying fraudulent credit card transactions within the IEEE-CIS Fraud Detection dataset \cite{b1}. Given the extreme class imbalance, we utilized the \textit{Area Under the Receiver Operating Characteristic Curve} (AUC-ROC) \cite{b2} as the primary metric to evaluate the models' ability to distinguish between classes. We compare LinearSVC, Decision Tree, and XGBoost classifiers. Our findings demonstrate that the XGBoost ensemble significantly outperformed the single-learner architectures.
 \end{abstract}
 
 \section{Exploratory Data Analysis (EDA)}
     \subsection{Data Structure Inspection}
+        The dataset consists of transaction and identity tables, which were merged by \texttt{TransactionID}.
         \begin{enumerate}
-            \item \par
-                Before any data transformation, we observed the \texttt{train} and \texttt{test} datasets had a mixture of \texttt{float64}, \texttt{int64} and \texttt{object} types
-            \item missing values \par
-                description goes here...
-            \item target balance \par
-                description goes here...
-        \end{enumerate}
-    \subsection{Statistical Summary \& Visualizations}
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=0.48\textwidth]{dist_pie.png}
-            \caption{isFraud Distribution}
-            \label{fig:dist-pie}
-        \end{figure}
+            \item \textbf{Data Types \& Memory Optimization:} 
+                Initially, the datasets contained a mixture of \texttt{float64}, \texttt{int64}, and \texttt{object} types, consuming over 1.7 GB for the training transaction set alone. To improve computational efficiency, we applied a memory reduction function, downcasting numerical columns to \texttt{float32} and converting strings to \texttt{category}. This reduced memory usage by approximately $51.5\%$, resulting in a final training structure of 590,540 rows and 434 columns (399 \texttt{float32}, 31 \texttt{category}) (Fig. \ref{tab:eda-stats}).
+            
+            \item \textbf{Missing Values:} 
+                The dataset is sparse. We observed that 414 out of 434 columns in the training set contained missing values, with 208 columns exceeding $60\%$ missing data (Fig. \ref{tab:eda-stats}). A parallel inspection of the test set revealed a nearly identical structure, suggesting that feature reduction would be necessary to reduce nois across both datasets.
 
-        An analysis of the \texttt{TransactionAmt} feature revealed a heavily right-skewed distribution, typical of financial data where small transactions are frequent and large ones are rare. To address this, we applied a log-transformation ($\log(1+x)$), which normalized the distribution (Figure \ref{fig:dist-comparison}), making it more suitable for linear classifiers like the SVM.
+            \item \textbf{Target Balance:} 
+                The target variable \texttt{isFraud} exhibits extreme class imbalance. Out of 590,540 samples, only 20,668 ($3.50\%$) were labeled as fraud, while 569,871 ($96.50\%$) were legitimate (Fig. \ref{fig:dist-pie}). This necessitates the use of metrics like AUC rather than simple accuracy.
+        \end{enumerate}
+
+    \subsection{Statistical Summary \& Visualizations}
+        The \texttt{TransactionAmt} feature revealed a heavily right-skewed distribution. To address this, we applied a log-transformation, which normalized the distribution (Fig. \ref{fig:dist-comparison}), making it more suitable for linear classifiers like the SVM.
 
         \begin{figure}[H]
             \centering
             \begin{minipage}{0.48\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{distamt_original.png}
+                \includegraphics[height=5cm]{distamt_original.png}
                 \caption{Original Skewed Distribution}
                 \label{fig:distamt-orig}
             \end{minipage}\hfill
             \begin{minipage}{0.48\textwidth}
                 \centering
-                \includegraphics[width=\linewidth]{distamt_log.png}
+                \includegraphics[height=5cm]{distamt_log.png}
                 \caption{Log-Transformed Distribution}
                 \label{fig:distamt-log}
             \end{minipage}
-            \caption{Transaction Amount Distribution. The log-transformation (Right) reveals a underlying normal-like structure, correcting the extreme skew observed in the raw data (Left).}
+            \caption{Transaction Amount Distribution. The log-transformation reveals a underlying normal-like structure, correcting the extreme skew observed in the raw data}
             \label{fig:dist-comparison}
         \end{figure}
         
         \begin{table}[H]
             \centering
-            \caption{some stats...}
+            \caption{Train Dataset Summary Statistics (after merge)}
             \begin{tabular}{|l|c|}
             \hline
-            \textbf{Metric } & \textbf{Value} \\
+            \textbf{Metric} & \textbf{Value} \\
             \hline
-                one & ... \\
-                two (\%) & ... \\
-                three & ... \\
-                four & ... \\
+                Total Rows & 590,540 \\
+                Total Columns & 434 \\
+                Numerical Features & 403 \\
+                Categorical Features & 31 \\
+                Cols with $>60\%$ Missing & 208 \\
             \hline
             \end{tabular}
-            % \label{tab:first_stats_resnet18}
+            \label{tab:eda-stats}
         \end{table}
+
+         \begin{figure}[H]
+            \centering
+            \includegraphics[height=6cm]{dist_pie.png}
+            \caption{isFraud Distribution}
+            \label{fig:dist-pie}
+        \end{figure}
+
     \subsection{Findings \& Hypotheses}
-    ...
-    \par\vspace{1em}
-    ...
+        Based on the EDA, we formed the following hypotheses to guide our modeling strategy:
+    \begin{itemize}
+        \item \textbf{Imbalance:} Due to the $96.5\%$ vs $3.5\%$ split, models will likely bias toward the majority class. As such, balancing training and validation sets will be important for model performance benchmarks.
+        \item \textbf{Feature Selection:} With 208 columns mostly empty, removing features with $>60\%$ missing values will likely improve model stability and training speed without losing significant information.
+        \item \textbf{Normalization:} The extreme skew in \texttt{TransactionAmt} confirms that scaling/normalization is necessary for distance-based algorithms like SVM to function correctly.
+    \end{itemize}
 
 \section{Data Pre-Processing \& Cleaning}
     \subsection{Removal of Noisy and Empty Features \cite{b3}}
-       We first calculated the percentage of missing values for every column in the training set. Columns exceeding the defined threshold ($60\%$) of missing data were dropped from both the training and test sets to reduce noise. Additionally, we removed non-predictive features, specifically \texttt{TransactionID} (an index) and \texttt{TransactionDT} (a time-delta), to prevent the model from memorizing row identifiers or learning spurious correlations that would not generalize to future data.
+       We first calculated the percentage of missing values for every column in the training set. Columns exceeding the defined threshold ($60\%$) of missing data were dropped from both the training and test sets to reduce noise. Additionally, we removed non-predictive features, specifically \texttt{TransactionID} (an index) and \texttt{TransactionDT} (a time-delta), to prevent the model from memorizing row identifiers or learning spurious correlations that would not generalize to test data.
 
     \subsection{Imputation of Missing Values \cite{b4}}
         The remaining missing values were adjusted using the \texttt{SimpleImputer} from Scikit-Learn. We adopted a split strategy based on feature type:
@@ -138,25 +147,25 @@
             \item \textbf{Tolerance}: We adjusted the stopping criteria precision using a standard tolerance ($1e^{-4}$) for the L2 models but a slightly looser tolerance ($1e^{-3}$) for the L1 models to ensure the convergence within a reasonable time.
         \end{itemize}
 
-        \subsection{Decision Tree \cite{b9}}
-            We implemented a Decision Tree as a non-linear baseline, utilizing \texttt{GridSearchCV} \cite{b8} to evaluate 18 candidate structures evaluated via 3-fold cross-validation:
-        \begin{itemize}
-            \item \textbf{Max Depth}: We compared restricted depths $[10, 20]$ against \texttt{None}, which allows the tree to grow until all leaves are pure (maximum complexity).
-            \item \textbf{Min Samples Split}: Tested $[20, 100, 500]$. Higher values force the tree to learn broader patterns by preventing it from creating specific rules for small groups of outliers.
-            \item \textbf{Criterion}: \texttt{'gini'} vs. \texttt{'entropy'} to compare splitting strategies based on Gini Impurity versus Information Gain.
-        \end{itemize}
+    \subsection{Decision Tree \cite{b9}}
+        We implemented a Decision Tree as a non-linear baseline, utilizing \texttt{GridSearchCV} \cite{b8} to evaluate 18 candidate structures evaluated via 3-fold cross-validation:
+    \begin{itemize}
+        \item \textbf{Max Depth}: We compared restricted depths $[10, 20]$ against \texttt{None}, which allows the tree to grow until all leaves are pure (maximum complexity).
+        \item \textbf{Min Samples Split}: Tested $[20, 100, 500]$. Higher values force the tree to learn broader patterns by preventing it from creating specific rules for small groups of outliers.
+        \item \textbf{Criterion}: \texttt{'gini'} vs. \texttt{'entropy'} to compare splitting strategies based on Gini Impurity versus Information Gain.
+    \end{itemize}
 
-        \subsection{Extreme Gradient Boosting (XGBoost) \cite{b10}}
-            We utilized the \texttt{XGBClassifier} with the following hyperparameters:
-        \begin{itemize}
-            \item \textbf{n\_estimators}: Set to $500$. This defines the ensemble size (number of trees), meaning the model corrects its errors sequentially 500 times to refine predictions.
-            \item \textbf{Learning Rate}: Set to $0.05$. A lower rate ensures that no single tree dominates the decision, preventing overfitting and leading to a more stable model.
-            \item \textbf{Subsample \& Colsample}: Both set to $0.9$. This forces each tree to train on a random $90\%$ of the rows and $90\%$ of the features.
-        \end{itemize}
+    \subsection{Extreme Gradient Boosting (XGBoost) \cite{b10}}
+        We utilized the \texttt{XGBClassifier} with the following hyperparameters:
+    \begin{itemize}
+        \item \textbf{n\_estimators}: Set to $500$. This defines the ensemble size (number of trees), meaning the model corrects its errors sequentially 500 times to refine predictions.
+        \item \textbf{Learning Rate}: Set to $0.05$. A lower rate ensures that no single tree dominates the decision, preventing overfitting and leading to a more stable model.
+        \item \textbf{Subsample \& Colsample}: Both set to $0.9$. This forces each tree to train on a random $90\%$ of the rows and $90\%$ of the features.
+    \end{itemize}
 
 \section{Model Comparison}
     \subsection{Performance Analysis}
-        Table \ref{tab:metrics-group} summarizes the performance of the three classifiers. Given the dataset's extreme class imbalance ($3.5\%$ fraud), standard \textbf{accuracy} was deemed an insufficient metric, as a naive classifier predicting "legitimate" for all transactions would achieve $\approx 96.5\%$ accuracy while failing to detect any fraud. 
+        Table \ref{tab:metrics-group} summarize the performance of the three classifiers. Given the dataset's extreme class imbalance ($3.5\%$ fraud), standard \textbf{accuracy} was deemed an insufficient metric, as a naive classifier predicting "legitimate" for all transactions would achieve $\approx 96.5\%$ accuracy while failing to detect any fraud. 
         
         Therefore, \textbf{precision} (to minimize customer friction from false positives), \textbf{recall} (to capture actual fraud losses), and the \textbf{F1-Score} (harmonic mean) are the primary indicators of success. \textbf{AUC-ROC} was used to evaluate the model's overall ability to rank fraudulent transactions higher than legitimate ones.
         
@@ -170,80 +179,82 @@
         \textbf{Computation:} The LinearSVC required PCA dimensionality reduction to converge within a reasonable timeframe. The Decision Tree was the fastest to train but failed to generalize its fast learning to new data. XGBoost, while computationally intensive due to the ensemble size, implements histogram-based optimization to maintain training efficiency on the large dataset.
         
         \textbf{Interpretability:} The Decision Tree offers the clearest "white-box" rules (e.g., "If Amount  $> 100$, then Fraud"). LinearSVC provides feature weights, though these interpretability benefits were negated by the PCA transformation which obscured the original features. XGBoost represents a "black-box" ensemble; while its internal logic is difficult to trace compared to a single tree, it delivers the highest predictive value.
+        
+        \begin{table}[H]
+            \centering
+            \renewcommand{\arraystretch}{1.25}
+            \caption{Metrics Comparison}
+            \label{tab:metrics-group}
+            \begin{minipage}{\linewidth}
+                \centering
+                \textbf{\normalsize Training Metrics} \\[5pt]
+                \begin{tabular}{|l|c|c|c|}
+                    \hline
+                    \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
+                    \hline
+                        accuracy & 0.74 & 0.98 & 0.98 \\
+                        precision (0, 1) & 0.99, 0.09 & 0.98, 0.92 & 0.99, 0.97 \\
+                        recall (0, 1) & 0.74, 0.73 & 1.00, 0.53 & 1.00, 0.68 \\
+                        f1-score (0, 1) & 0.85, 0.16 & 0.99, 0.68 & 0.99, 0.80 \\
+                    \hline
+                \end{tabular}
+            \end{minipage}
+
+            \vspace{2em}
+
+            \begin{minipage}{\linewidth}
+                \centering
+                \textbf{\normalsize Validation Metrics} \\[5pt]
+                \begin{tabular}{|l|c|c|c|}
+                    \hline
+                    \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
+                    \hline
+                        accuracy & 0.74 & 0.97 & 0.98\\
+                        precision (0, 1) & 0.99, 0.09 & 0.98, 0.77 & 0.98, 0.93 \\
+                        recall (0, 1) & 0.74, 0.73 & 1.00, 0.45 & 1.00, 0.56 \\
+                        f1-score (0, 1) & 0.85, 0.16 & 0.99, 0.57 & 0.99, 0.70 \\
+                    \hline
+                \end{tabular}
+            \end{minipage}
+
+            \vspace{2em}
+
+            \begin{minipage}{\linewidth}
+                \centering
+                \textbf{\normalsize AUC-ROC Metrics} \\[5pt]
+                \begin{tabular}{|l|c|c|c|}
+                    \hline
+                    \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
+                    \hline
+                        auc-roc & 0.815 & 0.848 & 0.962  \\
+                    \hline
+                \end{tabular}
+            \end{minipage}
+    \end{table}
+    
+    Figure \ref{fig:cmatrix-comparison} visualizes the distinct error patterns of each model. The \textbf{LinearSVC} detects the highest volume of fraud (High True Positives, bottom-right quadrant) but generates excessive false alarms (High False Positives, top-right), reflecting its "high recall, low precision" nature. Conversely, the \textbf{Decision Tree} misses the most fraud cases (Highest False Negatives, bottom-left), resulting in the lowest recall. \textbf{XGBoost} significantly minimizes False Positives (top-right) compared to the SVM while detecting more fraud than the Decision Tree, offering the most precise predictions.
 
     \begin{figure}[H]
     \centering
         \begin{minipage}{0.48\textwidth}
             \centering
             \includegraphics[width=\linewidth]{cmatrix_lsvc.png}
-            % \caption{LinearSVC}
             \label{fig:cmatrix-lsvc}
         \end{minipage}\hfill
         \begin{minipage}{0.48\textwidth}
             \centering
             \includegraphics[width=\linewidth]{cmatrix_dt.png}
-            % \caption{Decision Tree}
             \label{fig:cmatrix-dt}
         \end{minipage}\hfill
         \begin{minipage}{0.48\textwidth}
             \centering
             \includegraphics[width=\linewidth]{cmatrix_xgb.png}
-            % \caption{XGBoost}
             \label{fig:cmatrix-xgb}
         \end{minipage}
-        \caption{Comparison of Confusion Matrices across the three evaluated models.}
+        \caption{Confusion Matrices across three evaluated models.}
         \label{fig:cmatrix-comparison}
     \end{figure}
-    \par
-    Figure \ref{fig:cmatrix-comparison} visualizes the distinct error patterns of each model. The \textbf{LinearSVC} detects the highest volume of fraud (High True Positives, bottom-right quadrant) but generates excessive false alarms (High False Positives, top-right), reflecting its "high recall, low precision" nature. Conversely, the \textbf{Decision Tree} misses the most fraud cases (Highest False Negatives, bottom-left), resulting in the lowest recall. \textbf{XGBoost} significantly minimizes False Positives (top-right) compared to the SVM while detecting more fraud than the Decision Tree, offering the most precise predictions.
 
-    \begin{table}[H]
-        \centering
-        \caption{Metrics Comparison: Training, Validation, and AUC-ROC}
-        \begin{minipage}{\linewidth}
-            \centering
-            \caption{Training Metrics}
-            \begin{tabular}{|l|c|c|c|}
-            \hline
-            \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
-            \hline
-                accuracy & 0.74 & 0.98 & 0.98 \\
-                precision (0, 1) & 0.99, 0.09 & 0.98, 0.92 & 0.99, 0.97 \\
-                recall (0, 1) & 0.74, 0.73 & 1.00, 0.53 & 1.00, 0.68 \\
-                f1-score (0, 1) & 0.85, 0.16 & 0.99, 0.68 & 0.99, 0.80 \\
-            \hline
-            \end{tabular}
-        \end{minipage}
-        \vspace{1em}
-        \begin{minipage}{\linewidth}
-            \centering
-            \caption{Validation Metrics}
-            \begin{tabular}{|l|c|c|c|}
-            \hline
-            \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
-            \hline
-                accuracy & 0.74 & 0.97 & 0.98\\
-                precision (0, 1) & 0.99, 0.09 & 0.98, 0.77 & 0.98, 0.93 \\
-                recall (0, 1) & 0.74, 0.73 & 1.00, 0.45 & 1.00, 0.56 \\
-                f1-score (0, 1) & 0.85, 0.16 & 0.99, 0.57 & 0.99, 0.70 \\
-            \hline
-            \end{tabular}
-        \end{minipage}
-        \vspace{1em}
-        \begin{minipage}{\linewidth}
-            \centering
-            \caption{AUC-ROC Metrics}
-            \begin{tabular}{|l|c|c|c|}
-            \hline
-            \textbf{Metric } & \textbf{LinearSVC} & \textbf{Decision Tree} & \textbf{XGBoost} \\
-            \hline
-                auc-roc & 0.815 & 0.848 & 0.962  \\
-            \hline
-            \end{tabular}
-        \end{minipage}
-        \label{tab:metrics-group}
-    \end{table}
-        
 \section{Kaggle Submission}
     Each model's \textit{AUC-ROC} \cite{b2} results were submitted to the Kaggle competition \cite{b1} in \texttt{.csv} format. Each file is a two-column table with \texttt{TransactionID} and \texttt{isFraud} headers, indicating the confidence level that a transaction is fraudulent. Below are each model's score on the private and public test datasets.
     \begin{figure}[H]
@@ -253,7 +264,6 @@
             \label{fig:kaggle}
     \end{figure}
 
-\par\vspace{1em}
 \section*{Acknowledgment}
     We would like to thank Professor Arash Azarfar and Firat Oncel for their guidance and support throughout this project. Large Language Models, like Google's Gemini were used in an educational context to further understand the resources for this research.
 
