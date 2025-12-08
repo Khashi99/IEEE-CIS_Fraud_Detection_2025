@@ -52,10 +52,10 @@
         The dataset consists of transaction and identity tables, which were merged by \texttt{TransactionID}.
         \begin{enumerate}
             \item \textbf{Data Types \& Memory Optimization:} 
-                Initially, the datasets contained a mixture of \texttt{float64}, \texttt{int64}, and \texttt{object} types, consuming over 1.7 GB for the training transaction set alone. To improve computational efficiency, we applied a memory reduction function, downcasting numerical columns to \texttt{float32} and converting strings to \texttt{category}. This reduced memory usage by approximately $51.5\%$, resulting in a final training structure of 590,540 rows and 434 columns (399 \texttt{float32}, 31 \texttt{category}) (Fig. \ref{tab:eda-stats}).
+                Initially, the datasets contained a mixture of \texttt{float64}, \texttt{int64}, and \texttt{object} types, consuming over 1.7 GB for the training transaction set alone. To improve computational efficiency, we applied a memory reduction function, downcasting numerical columns to \texttt{float32} and converting strings to \texttt{category}. This reduced memory usage by approximately $51.5\%$, resulting in a final training structure of 590,540 rows and 434 columns (399 \texttt{float32}, 31 \texttt{category}) (Tab. \ref{tab:eda-stats}).
             
             \item \textbf{Missing Values:} 
-                The dataset is sparse. We observed that 414 out of 434 columns in the training set contained missing values, with 208 columns exceeding $60\%$ missing data (Fig. \ref{tab:eda-stats}). A parallel inspection of the test set revealed a nearly identical structure, suggesting that feature reduction would be necessary to reduce nois across both datasets.
+                The dataset is sparse. We observed that 414 out of 434 columns in the training set contained missing values, with 208 columns exceeding $60\%$ missing data (Tab. \ref{tab:eda-stats}). A parallel inspection of the test set revealed a nearly identical structure, suggesting that feature reduction would be necessary to reduce nois across both datasets.
 
             \item \textbf{Target Balance:} 
                 The target variable \texttt{isFraud} exhibits extreme class imbalance. Out of 590,540 samples, only 20,668 ($3.50\%$) were labeled as fraud, while 569,871 ($96.50\%$) were legitimate (Fig. \ref{fig:dist-pie}). This necessitates the use of metrics like AUC rather than simple accuracy.
